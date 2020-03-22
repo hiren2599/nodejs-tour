@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 process.on('uncaughtException', err => {
+  //Synchronous
   console.log(err.name, err.message);
   console.log('uncaught exception so closing down the server');
   process.exit(1);
@@ -31,9 +32,11 @@ const server = app.listen(process.env.PORT, '127.0.0.1', () => {
 });
 
 process.on('unhandledRejection', err => {
+  //Asynchronous handled
   console.log(err.name, err.message);
   console.log('unhandled exception so closing down the server');
   server.close(() => {
+    //use server.close() as it gives time to server to shut down
     process.exit(1);
   });
 });
