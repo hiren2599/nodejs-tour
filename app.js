@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const tourrouter = require('./routes/tourroutes');
+const rateLimit = require('express-rate-limit');
 const userrouter = require('./routes/userroutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -12,6 +13,15 @@ const app = express();
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message:
+    'Maximum limit of request is reached,try again after an hour'
+});
+
+app.use('/api', limiter);
 
 app.use(express.json());
 

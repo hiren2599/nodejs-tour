@@ -45,7 +45,12 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
-  passwordResetExpiresOn: Date
+  passwordResetExpiresOn: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false
+  }
 });
 
 userSchema.pre('save', async function(next) {
@@ -56,6 +61,21 @@ userSchema.pre('save', async function(next) {
   this.password = await bcrypt.hash(this.password, 12);
   //deleting the passwordconfirm field
   this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre('save', function(next) {
+  if (!this.isModified('passwrod') || this.isNew) {
+    return next();
+  }
+
+  this.passwordChangedAt = Date.now() - 1000; //It takes time to change so sub 1sec
+  next();
+});
+
+userSchema.pre(/^find/, function(next) {
+  //Query middleware
+  this.find({ active: { $ne: false } });
   next();
 });
 
