@@ -1,15 +1,17 @@
 const express = require('express');
 const morgan = require('morgan');
-const tourrouter = require('./routes/tourroutes');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const dataSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 
-const userrouter = require('./routes/userroutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
+
+const tourrouter = require('./routes/tourroutes');
+const userrouter = require('./routes/userroutes');
+const reviewrouter = require('./routes/reviewroutes');
 
 const app = express();
 
@@ -93,6 +95,7 @@ app.use((req, res, next) => {
 //Routes
 app.use('/api/v1/tours', tourrouter);
 app.use('/api/v1/users', userrouter);
+app.use('/api/v1/reviews', reviewrouter);
 //server on
 
 app.all('*', (req, res, next) => {
