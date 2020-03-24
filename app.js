@@ -2,6 +2,11 @@ const express = require('express');
 const morgan = require('morgan');
 const tourrouter = require('./routes/tourroutes');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const dataSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
+
 const userrouter = require('./routes/userroutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -9,23 +14,51 @@ const globalErrorHandler = require('./controllers/errorController');
 const app = express();
 
 //Middlewares
-// console.log(process.env.NODE_ENV);
+
+//set security http headers
+app.use(helmet());
+
+// development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+//limit the number of requests
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
   message:
     'Maximum limit of request is reached,try again after an hour'
 });
-
 app.use('/api', limiter);
 
-app.use(express.json());
+//Body parser,reading data from body into req.body
+app.use(express.json({ limit: '10kb' }));
 
+//DataSanitize against nosql query injections
+app.use(dataSanitize());
+
+//Data sanitization from xss
+app.use(xss());
+
+//Prevent paramete pollution   eg:=  sort=duration&sort=price
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'price',
+      'difficulty',
+      'maxGroupSize',
+      'ratingsAverage'
+    ]
+  })
+);
+
+//static files
 app.use(express.static(`${__dirname}/public`));
+
+//testing middleware
 app.use((req, res, next) => {
   console.log('middlleware testing');
   next();
