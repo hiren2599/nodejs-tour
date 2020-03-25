@@ -5,53 +5,59 @@ const bcrypt = require('bcryptjs');
 
 //Fat models thin controller
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-    required: [true, 'Please enter a name']
-  },
-  password: {
-    type: String,
-    required: [true, 'enter a password'],
-    minlength: 8,
-    select: false
-  },
-  passwordConfirm: {
-    type: String,
-    required: [true, 'enter the confirm password'],
-    validate: {
-      //This validator works only when saving(creating) the user
-      validator: function(el) {
-        return el === this.password;
-      },
-      message: 'The passwords are not same'
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      trim: true,
+      required: [true, 'Please enter a name']
+    },
+    password: {
+      type: String,
+      required: [true, 'enter a password'],
+      minlength: 8,
+      select: false
+    },
+    passwordConfirm: {
+      type: String,
+      required: [true, 'enter the confirm password'],
+      validate: {
+        //This validator works only when saving(creating) the user
+        validator: function(el) {
+          return el === this.password;
+        },
+        message: 'The passwords are not same'
+      }
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin', 'guide', 'lead-guide'],
+      default: 'user'
+    },
+    email: {
+      type: String,
+      required: [true, 'Please enter the email address'],
+      unique: true,
+      lowercase: true,
+      validate: [validator.isEmail, 'Please enter a valid email']
+    },
+    photo: {
+      type: String
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpiresOn: Date,
+    active: {
+      type: Boolean,
+      default: true,
+      select: false
     }
   },
-  role: {
-    type: String,
-    enum: ['user', 'admin', 'guide', 'lead-guide'],
-    default: 'user'
-  },
-  email: {
-    type: String,
-    required: [true, 'Please enter the email address'],
-    unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, 'Please enter a valid email']
-  },
-  photo: {
-    type: String
-  },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpiresOn: Date,
-  active: {
-    type: Boolean,
-    default: true,
-    select: false
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
-});
+);
 
 userSchema.pre('save', async function(next) {
   //only excuted when password is modified
