@@ -38,8 +38,8 @@ const reviews = JSON.parse(
 //impor data
 const importData = async () => {
   try {
-    await Tour.create(tours);
-    await User.create(users, { validateBeforeSave: false });
+    // await Tour.create(tours);
+    // await User.create(users, { validateBeforeSave: false });
     await Review.create(reviews);
     console.log('successfully added to database');
   } catch (err) {
@@ -51,8 +51,8 @@ const importData = async () => {
 //delete all data from collections
 const deleteData = async () => {
   try {
-    await Tour.deleteMany();
-    await User.deleteMany();
+    // await Tour.deleteMany();
+    // await User.deleteMany();
     await Review.deleteMany();
     console.log('delete succesfully');
   } catch (err) {
