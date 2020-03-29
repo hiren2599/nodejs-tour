@@ -25,29 +25,53 @@ const handleJWTError = err =>
 const handleJWTExpiredError = err =>
   new AppError('Token expire.Please log in again!', 401);
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
-    message: err.message,
-    stack: err.stack
-  });
-};
-
-const sendErrorProd = (err, res) => {
-  // Operational error , message to client
-  if (err.isOperational) {
+const sendErrorDev = (err, req, res) => {
+  if (req.originalUrl.startsWith('/api')) {
     res.status(err.statusCode).json({
       status: err.status,
-      message: err.message
+      error: err,
+      message: err.message,
+      stack: err.stack
+    });
+  } else {
+    res.status(err.statusCode).render('error', {
+      title: 'Something went wrong',
+      msg: err.message
+    });
+  }
+};
+
+const sendErrorProd = (err, req, res) => {
+  // Operational error , message to client
+  if (req.originalUrl.startsWith('/api')) {
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message
+      });
+    }
+    // Logging
+    console.error('error ', err);
+    //send generic message
+    return res.status(500).json({
+      status: 'error',
+      message: 'something went very wrong'
+    });
+  }
+  //REndered website
+
+  if (err.isOperational) {
+    res.status(err.statusCode).render('error', {
+      title: 'Something went wrong',
+      msg: err.message
     });
   } else {
     // Logging
     console.error('error ', err);
     //send generic message
-    res.status(500).json({
-      status: 'error',
-      message: 'something went very wrong'
+    res.status(err.statusCode).render('error', {
+      title: 'Something went wrong',
+      msg: 'Please try again later'
     });
   }
 };
@@ -57,11 +81,12 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(err, res);
+    sendErrorDev(err, req, res);
     // } else if (process.env.NODE_ENV === 'production') {
   } else {
     // eslint-disable-next-line node/no-unsupported-features/es-syntax
     let error = { ...err };
+    error.message = err.message;
     if (error.name === 'CastError') error = handleCastError(error);
     if (error.code === 11000) error = handleDuplicateError(error);
     if (error.name === 'ValidationError')
@@ -70,7 +95,7 @@ module.exports = (err, req, res, next) => {
       error = handleJWTError(error);
     if (error.name === 'TokenExpiredError')
       error = handleJWTExpiredError(error);
-    sendErrorProd(error, res);
+    sendErrorProd(error, req, res);
   }
   next();
 };

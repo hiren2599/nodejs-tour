@@ -71,6 +71,14 @@ exports.login = catchAsync(async (req, res, next) => {
   createAndSendToken(user, 200, res);
 });
 
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) getting token and check if it there
   let token;
@@ -110,9 +118,42 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   //access granted
+  res.locals.user = currentuser;
   req.user = currentuser;
   next();
 });
+
+exports.isLoggedIn = async (req, res, next) => {
+  // 1) getting token and check if it there
+
+  if (req.cookies.jwt) {
+    try {
+      // 2) verification token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+
+      // 3) check if user still exists
+      const currentuser = await User.findById(decoded.id);
+      if (!currentuser) {
+        return next();
+      }
+
+      // 4) if password is changed
+      if (currentuser.changesPasswordAt(decoded.iat)) {
+        return next();
+      }
+
+      //access granted
+      res.locals.user = currentuser;
+      return next();
+    } catch (error) {
+      return next();
+    }
+  }
+  next();
+};
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
