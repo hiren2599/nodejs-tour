@@ -14,6 +14,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourrouter = require('./routes/tourroutes');
 const userrouter = require('./routes/userroutes');
 const reviewrouter = require('./routes/reviewroutes');
+const bookingrouter = require('./routes/bookingroutes');
 const viewrouter = require('./routes/viewroutes');
 
 const app = express();
@@ -106,6 +107,7 @@ app.use('/', viewrouter);
 app.use('/api/v1/tours', tourrouter);
 app.use('/api/v1/users', userrouter);
 app.use('/api/v1/reviews', reviewrouter);
+app.use('/api/v1/bookings', bookingrouter);
 //server on
 
 app.all('*', (req, res, next) => {
