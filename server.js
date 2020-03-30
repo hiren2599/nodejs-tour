@@ -3,14 +3,14 @@ const dotenv = require('dotenv');
 
 process.on('uncaughtException', err => {
   //Synchronous
-  console.log(err.name, err.message);
+  // console.log(err.name, err.message);
   console.log('uncaught exception so closing down the server');
   process.exit(1);
 });
 
 dotenv.config({ path: './config.env' });
 const app = require('./app');
-// console.log(process.env);
+//  console.log(process.env);
 
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',

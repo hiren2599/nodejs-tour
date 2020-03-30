@@ -13,7 +13,7 @@ module.exports = class Email {
   newTransport() {
     if (process.env.NODE_ENV !== 'development') {
       //sendgrid
-      console.log('hlp2599');
+      // console.log('hlp2599');
       return nodemailer.createTransport({
         service: 'SendGrid',
         auth: {
@@ -22,7 +22,7 @@ module.exports = class Email {
         }
       });
     }
-    console.log('hiren');
+    // console.log('hiren');
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
