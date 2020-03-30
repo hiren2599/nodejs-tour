@@ -41,3 +41,10 @@ process.on('unhandledRejection', err => {
     process.exit(1);
   });
 });
+
+process.on('SIGNTERM', () => {
+  console.log('shutting down as signterm received');
+  server.close(() => {
+    console.log('Process terminated');
+  });
+});
