@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieparser = require('cookie-parser');
 const compression = require('compression');
+const cors = requre('cors');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -26,6 +27,10 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 //Middlewares
+app.use(cors());
+// Access control allow origin *
+
+app.options('*', cors());
 
 //set security http headers
 app.use(helmet());
