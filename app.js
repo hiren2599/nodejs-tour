@@ -54,7 +54,7 @@ app.use('/api', limiter);
 app.post(
   '/webhook-checkout',
   bodyParser.raw({ type: 'application/json' }),
-  bookingController.createBookingCheckout
+  bookingController.webhookCheckout
 );
 
 //Body parser,reading data from body into req.body
