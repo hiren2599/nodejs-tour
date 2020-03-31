@@ -10,6 +10,7 @@ exports.alerts = (req, res, next) => {
   if (alert === 'booking')
     res.locals.alert =
       'Your booking is successfully done.Confirmation is send to email.Please wait if there is not in page';
+  next();
 };
 
 exports.getOverview = catchAsync(async (req, res, next) => {
