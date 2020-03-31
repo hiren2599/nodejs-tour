@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 process.on('uncaughtException', err => {
   //Synchronous
   // console.log(err.name, err.message);
+  console.log(err);
   console.log('uncaught exception so closing down the server');
   process.exit(1);
 });
