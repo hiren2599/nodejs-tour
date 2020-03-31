@@ -17,6 +17,7 @@ const tourrouter = require('./routes/tourroutes');
 const userrouter = require('./routes/userroutes');
 const reviewrouter = require('./routes/reviewroutes');
 const bookingrouter = require('./routes/bookingroutes');
+const bookingController = require('./controllers/bookingController');
 const viewrouter = require('./routes/viewroutes');
 
 const app = express();
@@ -48,6 +49,12 @@ const limiter = rateLimit({
     'Maximum limit of request is reached,try again after an hour'
 });
 app.use('/api', limiter);
+
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'applicatioin/json' }),
+  bookingController.createBookingCheckout
+);
 
 //Body parser,reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
