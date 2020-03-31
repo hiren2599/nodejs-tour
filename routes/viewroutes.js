@@ -5,7 +5,7 @@ const bookingControllers = require('./../controllers/bookingController');
 
 const router = express.Router();
 
-router.use(viewControllers.alert);
+router.use(viewControllers.alerts);
 
 router.get(
   '/',
